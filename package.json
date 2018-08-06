@@ -1,7 +1,13 @@
 {
-  "name": "d3-test",
+  "name": "vue-d3-tree",
   "version": "0.1.0",
-  "private": true,
+  "description": "A Vue.js project for d3 tree visualization",
+  "license": "MIT",
+  "author": {
+    "email": "swann.castel@hotmail.fr",
+    "name": "Swann CASTEL",
+    "url": "https://castel.iiens.net"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -24,6 +30,7 @@
     "lint-staged": "^7.2.0",
     "vue-template-compiler": "^2.5.16"
   },
+  "private": false,
   "gitHooks": {
     "pre-commit": "lint-staged"
   },
