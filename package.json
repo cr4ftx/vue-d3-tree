@@ -2,15 +2,19 @@
   "name": "vue-d3-tree",
   "version": "0.1.0",
   "description": "A Vue.js project for d3 tree visualization",
+  "keywords": [
+    "vue", "js", "d3", "tree", "visualization", "collapsible", "layout", "data", "cluster"
+  ],
   "license": "MIT",
   "author": {
     "email": "swann.castel@hotmail.fr",
     "name": "Swann CASTEL",
     "url": "https://castel.iiens.net"
   },
+  "main": "dist/vue-d3-tree.umd.min.js",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --target lib --name vue-d3-tree ./src/components/Tree.vue",
     "lint": "vue-cli-service lint",
     "test:unit": "vue-cli-service test:unit"
   },
@@ -31,6 +35,9 @@
     "vue-template-compiler": "^2.5.16"
   },
   "private": false,
+  "publishConfig": {
+    "registry": "http://localhost:8081/repository/npm-package/"
+  },
   "gitHooks": {
     "pre-commit": "lint-staged"
   },

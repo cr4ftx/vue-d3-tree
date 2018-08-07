@@ -7,8 +7,13 @@
       :duration="1000"
       :data="data"
       @click="click"
-      :customClass="operationsClass"
+      :link-class="operationsClass"
+      :type="type"
     ></tree>
+    <select name="type" v-model="type">
+      <option value="tree">Tree</option>
+      <option value="cluster">Cluster</option>
+    </select>
   </div>
 </template>
 
@@ -25,7 +30,8 @@ export default {
 
   data () {
     return {
-      data
+      data,
+      type: 'tree'
     }
   },
 
@@ -47,15 +53,10 @@ export default {
   #vue-d3-tree svg {
     outline: solid 2px lightgray;
   }
-  .node-circle {
+  .node circle {
+    stroke: steelblue;
+    stroke-width: 2px;
     fill: white;
-    stroke: steelblue;
-    stroke-width: 2px;
-  }
-  .node-circle-children {
-    fill: lightsteelblue;
-    stroke: steelblue;
-    stroke-width: 2px;
   }
   .link {
     fill: none;
@@ -66,10 +67,10 @@ export default {
     font: 12px sans-serif;
   }
   .link--operations {
-    stroke: red;
+    stroke: lightcoral;
   }
   .link--no-operations {
-    stroke: green;
+    stroke: lightgreen;
   }
   html {
     text-align: center;

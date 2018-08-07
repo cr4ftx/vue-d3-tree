@@ -4,7 +4,14 @@
 </template>
 
 <script>
-import * as d3 from 'd3'
+import * as d3Hierachy from 'd3-hierarchy'
+import * as d3Selector from 'd3-selection'
+import * as d3Transition from 'd3-transition'
+const d3 = {
+  ...d3Hierachy,
+  ...d3Selector,
+  ...d3Transition
+}
 
 export default {
   name: 'tree',
@@ -48,7 +55,7 @@ export default {
       required: false,
       default: 20
     },
-    'custom-class': {
+    linkClass: {
       type: Function,
       required: false,
       default: () => ''
@@ -172,7 +179,6 @@ export default {
       nodeUpdate.selectAll('circle')
         .transition()
         .duration(this.duration)
-        .attr('class', d => `node-circle${d._children ? '-children' : ''}`)
         .attr('r', 7)
       nodeUpdate.selectAll('text')
         .transition()
@@ -195,7 +201,7 @@ export default {
       // enter
       const linkEnter = link.enter()
         .insert('path', 'g')
-        .attr('class', d => `link ${this.customClass(d.data)}`)
+        .attr('class', d => `link ${this.linkClass(d.data)}`)
         .attr('fill', 'none')
         .attr('stroke', 'gray')
         .attr('d', () => {

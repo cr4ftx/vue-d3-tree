@@ -1,4 +1,4 @@
-# d3-test
+# vue-d3-test
 
 ## Project setup
 ```
