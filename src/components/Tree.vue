@@ -38,10 +38,26 @@ export default {
       required: false,
       default: 500
     },
+    margiWidth: {
+      type: Number,
+      required: false,
+      default: 150
+    },
+    marginHeight: {
+      type: Number,
+      required: false,
+      default: 20
+    },
     'custom-class': {
       type: Function,
       required: false,
-      default () { return '' }
+      default: () => ''
+    },
+    type: {
+      type: String,
+      required: false,
+      default: 'tree',
+      validator: v => ['tree', 'cluster'].includes(v)
     }
   },
 
@@ -57,12 +73,24 @@ export default {
   watch: {
     data () {
       this.count = 0
-
-      this.root = d3.hierarchy(this.data, d => d[this.children])
-      this.root.x0 = this.height / 2
-      this.root.y0 = 0
-
+      this.initRoot()
       this.update(this.root)
+    },
+    type () {
+      this.update(this.root)
+    }
+  },
+
+  computed: {
+    treeLayout () {
+      const layout = this.type === 'cluster'
+        ? d3.cluster()
+        : d3.tree()
+      return layout
+        .size([
+          this.height - this.marginHeight * 2,
+          this.width - this.margiWidth * 2
+        ])
     }
   },
 
@@ -72,31 +100,31 @@ export default {
       .attr('width', this.width)
       .attr('height', this.height)
       .append('g')
-      .attr('transform', 'translate(50, 50)')
+      .attr('transform', `translate(${this.margiWidth}, ${this.marginHeight})`)
 
-    this.tree = d3.tree()
-      .size([this.height, this.width])
-
-    this.root = d3.hierarchy(this.data, d => d[this.children])
-    this.root.x0 = this.height / 2
-    this.root.y0 = 0
-
+    this.initRoot()
     this.update(this.root)
   },
 
   methods: {
+    initRoot () {
+      this.root = d3.hierarchy(this.data, d => d[this.children])
+      this.root.x0 = (this.height - this.marginHeight * 2) / 2
+      this.root.y0 = 0
+    },
+
     update (source) {
-      const treeData = this.tree(this.root)
+      this.treeLayout(this.root)
 
-      const nodes = treeData.descendants()
-      const links = treeData.descendants().slice(1)
+      const nodes = this.root.descendants()
+      const links = this.root.descendants().slice(1)
 
-      const depth = Math.max(...nodes.map(n => n.depth)) + 1
-      nodes.forEach(d => { d.y = d.depth * (this.width / depth) })
+      // const maxDepth = Math.max(...nodes.map(n => n.depth)) + 1
+      // nodes.forEach(d => { d.y = d.depth * (this.width / maxDepth) })
 
-      const node = this.canvas.selectAll(`g.node`)
+      const node = this.canvas.selectAll(`.node`)
         .data(nodes, d => d.id || (d.id = this.count++))
-      const link = this.canvas.selectAll('path.link')
+      const link = this.canvas.selectAll('.link')
         .data(links, d => d.id)
 
       this.refreshNodes(source, node)
@@ -167,8 +195,7 @@ export default {
       // enter
       const linkEnter = link.enter()
         .insert('path', 'g')
-        .attr('class', d => this.customClass(d.data))
-        .classed('link', true)
+        .attr('class', d => `link ${this.customClass(d.data)}`)
         .attr('fill', 'none')
         .attr('stroke', 'gray')
         .attr('d', () => {

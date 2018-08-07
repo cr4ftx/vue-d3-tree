@@ -14,6 +14,7 @@
 
 <script>
 import Tree from './components/Tree'
+import data from '../static/data.json'
 
 export default {
   name: 'app',
@@ -24,19 +25,7 @@ export default {
 
   data () {
     return {
-      data: {
-        name: 'root',
-        children: [
-          {
-            name: 'son1',
-            children: [{ name: 'grandgrandson1' }, { name: 'grandson2' }]
-          },
-          {
-            name: 'son2',
-            children: [{ name: 'grandson3', children: [{ name: 'grandgrandson1' }, { name: 'grandgrandson2' }] }, { name: 'grandson4' }]
-          }
-        ]
-      }
+      data
     }
   },
 
@@ -46,15 +35,17 @@ export default {
     },
 
     operationsClass (element) {
-      return element.children ? 'aaaaaaaaaa' : 'bbbbbbbbbbbbbb'
+      return element.name.length % 2 === 0
+        ? 'link--operations'
+        : 'link--no-operations'
     }
   }
 }
 </script>
 
 <style>
-  #vue-d3-tree {
-    border: solid 2px lightgray;
+  #vue-d3-tree svg {
+    outline: solid 2px lightgray;
   }
   .node-circle {
     fill: white;
@@ -73,5 +64,14 @@ export default {
   }
   .node text {
     font: 12px sans-serif;
+  }
+  .link--operations {
+    stroke: red;
+  }
+  .link--no-operations {
+    stroke: green;
+  }
+  html {
+    text-align: center;
   }
 </style>
