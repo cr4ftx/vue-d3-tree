@@ -7,7 +7,7 @@
       :duration="1000"
       :data="data"
       @click="click"
-      :link-class="operationsClass"
+      :link-class="linkClass"
       :type="type"
     ></tree>
     <select name="type" v-model="type">
@@ -40,39 +40,49 @@ export default {
       console.log(name)
     },
 
-    operationsClass (element) {
+    render () {
+      console.log('render')
+    },
+
+    linkClass (element) {
       return element.name.length % 2 === 0
-        ? 'link--operations'
-        : 'link--no-operations'
+        ? 'tree-link--red'
+        : 'tree-link--green'
     }
   }
 }
 </script>
 
 <style>
-  #vue-d3-tree svg {
-    outline: solid 2px lightgray;
+  html {
+    text-align: center;
   }
-  .node circle {
-    stroke: steelblue;
-    stroke-width: 2px;
-    fill: white;
+  svg {
+    border: solid 1px lightgray;
+    border-radius: 3px;
   }
-  .link {
+  .tree-text {
+    font: 12px sans-serif;
+  }
+  .tree-link {
     fill: none;
     stroke: #ccc;
     stroke-width: 2px;
   }
-  .node text {
-    font: 12px sans-serif;
+  .tree-circle {
+    stroke: steelblue;
+    stroke-width: 2px;
+    fill: white;
+    transition: fill .75s;
   }
-  .link--operations {
+  .tree-circle-hide {
+    fill: lightsteelblue;
+    transition: fill .75s;
+  }
+  .tree-link--red {
     stroke: lightcoral;
   }
-  .link--no-operations {
+  .tree-link--green {
     stroke: lightgreen;
-  }
-  html {
-    text-align: center;
   }
 </style>

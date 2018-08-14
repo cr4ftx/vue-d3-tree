@@ -4,13 +4,13 @@
 </template>
 
 <script>
+import 'd3-transition'
 import * as d3Hierachy from 'd3-hierarchy'
-import * as d3Selector from 'd3-selection'
-import * as d3Transition from 'd3-transition'
+import * as d3Selection from 'd3-selection'
+
 const d3 = {
   ...d3Hierachy,
-  ...d3Selector,
-  ...d3Transition
+  ...d3Selection
 }
 
 export default {
@@ -45,7 +45,7 @@ export default {
       required: false,
       default: 500
     },
-    margiWidth: {
+    marginWidth: {
       type: Number,
       required: false,
       default: 150
@@ -53,7 +53,7 @@ export default {
     marginHeight: {
       type: Number,
       required: false,
-      default: 20
+      default: 30
     },
     linkClass: {
       type: Function,
@@ -83,9 +83,11 @@ export default {
       this.initRoot()
       this.update(this.root)
     },
-    type () {
-      this.update(this.root)
-    }
+    marginHeight: 'updateSize',
+    marginWidth: 'updateSize',
+    type: 'updateSize',
+    height: 'updateSize',
+    width: 'updateSize'
   },
 
   computed: {
@@ -96,7 +98,7 @@ export default {
       return layout
         .size([
           this.height - this.marginHeight * 2,
-          this.width - this.margiWidth * 2
+          this.width - this.marginWidth * 2
         ])
     }
   },
@@ -107,7 +109,7 @@ export default {
       .attr('width', this.width)
       .attr('height', this.height)
       .append('g')
-      .attr('transform', `translate(${this.margiWidth}, ${this.marginHeight})`)
+      .attr('transform', `translate(${this.marginWidth}, ${this.marginHeight})`)
 
     this.initRoot()
     this.update(this.root)
@@ -120,18 +122,26 @@ export default {
       this.root.y0 = 0
     },
 
+    updateSize () {
+      const canvas = d3.select(`#${this.id} svg`)
+        .transition()
+        .duration(this.duration)
+        .attr('width', this.width)
+        .attr('height', this.height)
+      canvas.select('g')
+        .attr('transform', `translate(${this.marginWidth}, ${this.marginHeight})`)
+      this.update(this.root)
+    },
+
     update (source) {
       this.treeLayout(this.root)
 
       const nodes = this.root.descendants()
       const links = this.root.descendants().slice(1)
 
-      // const maxDepth = Math.max(...nodes.map(n => n.depth)) + 1
-      // nodes.forEach(d => { d.y = d.depth * (this.width / maxDepth) })
-
-      const node = this.canvas.selectAll(`.node`)
+      const node = this.canvas.selectAll(`.tree-node`)
         .data(nodes, d => d.id || (d.id = this.count++))
-      const link = this.canvas.selectAll('.link')
+      const link = this.canvas.selectAll('.tree-link')
         .data(links, d => d.id)
 
       this.refreshNodes(source, node)
@@ -148,7 +158,6 @@ export default {
       // enter
       const nodeEnter = node.enter()
         .append('g')
-        .attr('class', 'node')
         .attr('cursor', 'pointer')
         .attr('transform', d => `translate(${source.y0}, ${source.x0})`)
       nodeEnter.append('circle')
@@ -175,14 +184,21 @@ export default {
       const nodeUpdate = nodeEnter.merge(node)
       nodeUpdate.transition()
         .duration(this.duration)
+        .attr('class', 'tree-node')
         .attr('transform', d => `translate(${d.y}, ${d.x})`)
       nodeUpdate.selectAll('circle')
+        .classed('tree-circle', true)
+        .classed('tree-circle-hide', d => !!d._children)
         .transition()
         .duration(this.duration)
-        .attr('r', 7)
+        .attr('r', 5)
+        .attr('stroke', 'steelblue')
+        .attr('stroke-width', '2px')
+        .attr('fill', d => d._children ? 'lightgrey' : 'white')
       nodeUpdate.selectAll('text')
         .transition()
         .duration(this.duration)
+        .attr('class', 'tree-text')
         .style('fill-opacity', 1)
 
       // exit
@@ -201,7 +217,7 @@ export default {
       // enter
       const linkEnter = link.enter()
         .insert('path', 'g')
-        .attr('class', d => `link ${this.linkClass(d.data)}`)
+        .attr('class', d => `tree-link ${this.linkClass(d.data)}`)
         .attr('fill', 'none')
         .attr('stroke', 'gray')
         .attr('d', () => {
